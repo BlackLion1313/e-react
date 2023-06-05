@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "name": "server",
+  "version": "1.0.0",
+  "description": "MERN Stack Project",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "both": "concurrently \"nodemon index.js\" \"cd ../client && npm run dev\""
+  },
+  "author": "mila",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22"
+  }
+}
