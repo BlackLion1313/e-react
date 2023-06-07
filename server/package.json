@@ -1,19 +1,19 @@
 {
-  "type": "module",
   "name": "server",
   "version": "1.0.0",
-  "description": "MERN Stack Project",
+  "description": "some short description about the project....",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
-    "both": "concurrently \"nodemon index.js\" \"cd ../client && npm run dev\""
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
   },
-  "author": "mila",
+  "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^8.1.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.1.4",
     "express": "^4.18.2",
-    "nodemon": "^2.0.22"
-  }
+    "mongoose": "^7.2.2"
+  },
+  "type": "module"
 }

@@ -1,19 +1,45 @@
 import express from "express";
-import cors from 'cors';
-
+import cors from "cors";
 const app = express();
-const port = process.env.PORT || 5001;
+import * as dotenv from "dotenv";
+dotenv.config();
+import mongoose from "mongoose";
+import testRouter from "./routes/testRouter.js";
+import citiesRouter from "./routes/citiesRouter.js";
 
+const addMiddlewares = () => {
+  app.use(express.json());
+  app.use(
+    express.urlencoded({
+      extended: true,
+    })
+  );
 
-app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
-app.use(cors());
+  app.use(cors());
+};
 
+const startServer = () => {
+  const port = process.env.PORT || 5001;
 
-app.listen(port, () => {
-  console.log("Server is running on bla port" + port);
-});
+  app.listen(port, () => {
+    console.log("Server is running in port ", port);
+  });
+};
+
+const connectMongoDB = async () => {
+  await mongoose.connect(process.env.DB);
+  console.log("Mongo DB is bla bla running");
+};
+
+const loadRoutes = () => {
+  app.use("/test", testRouter);
+  app.use("/api/cities", citiesRouter);
+};
+
+//IIFE
+(async function controller() {
+  await connectMongoDB();
+  addMiddlewares();
+  loadRoutes();
+  startServer();
+})();
