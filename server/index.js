@@ -6,6 +6,7 @@ dotenv.config();
 import mongoose from "mongoose";
 import testRouter from "./routes/testRouter.js";
 import citiesRouter from "./routes/citiesRouter.js";
+import museumsRoutes from "./routes/museumsRoutes.js";
 
 const addMiddlewares = () => {
   app.use(express.json());
@@ -28,12 +29,13 @@ const startServer = () => {
 
 const connectMongoDB = async () => {
   await mongoose.connect(process.env.DB);
-  console.log("Mongo DB is bla bla running");
+  console.log("Mongo DB is running");
 };
 
 const loadRoutes = () => {
   app.use("/test", testRouter);
   app.use("/api/cities", citiesRouter);
+  app.use("/api/museums", museumsRoutes);
 };
 
 //IIFE

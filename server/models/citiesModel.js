@@ -18,6 +18,7 @@ const citySchema = new mongoose.Schema({
     required: false,
     unique: false,
   },
+  museums: [{ type: mongoose.Schema.Types.ObjectId, ref: "museum" }],
 });
 
 const citiesModel = mongoose.model("city", citySchema);
