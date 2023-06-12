@@ -1,13 +1,17 @@
-import './App.css'
+
+
+import "./App.css";
+import Register from "./views/Register";
 
 function App() {
 
 
   return (
     <>
-    <h1>Mila Alenina</h1>
-     </>
-  )
+      <h1>Travel App</h1>
+      <Register />
+    </>
+  );
 }
 
-export default App
+export default App;
