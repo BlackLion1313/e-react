@@ -1,25 +1,50 @@
-import { exercisesModel } from '../models/exercisesModel.js';
+import mongoose from 'mongoose';
+import exercisesModel  from '../models/exercisesModel.js';
 
 
-async function createExercise(req, res) {
+const getExercises = async(req, res)=>{
+
   try {
-    const exercise = new exercisesModel(req.body);
-    await exercise.save();
-    res.status(201).json({ success: true, exercise });
+    const allExercises = await exercisesModel.find({})
+
+    // console.log('allExercises', allExercises)
+    res.status(200).json({
+      allExercises
+    })
+    
   } catch (error) {
-    console.error('Failed to create exercise:', error);
-    res.status(500).json({ success: false, error: 'Failed to create exercise' });
+    res.status(500).json({
+      msg:"something went wrong in the server"
+    })
   }
 }
 
-async function getExercises(req, res) {
-  try {
-    const exercises = await exercisesModel.find();
-    res.json({ success: true, exercises });
-  } catch (error) {
-    console.error('Failed to fetch exercises:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch exercises' });
-  }
+ async function createExercise(req, res) {
+  console.log("createExercise run")
+
+  console.log('req.body', req.body)
+const{exerciseId, title,description, code, missingWords, difficulty, hints, solution }=req.body
+
+  const newExercise = new exercisesModel({
+    exerciseId: req.body.exerciseId,
+    title:title,
+    description:description,
+    code:code,
+    missingWords:missingWords,
+    difficulty:difficulty,
+    hints:hints,
+    solution:solution
+  })
+
+const savedExercise = await newExercise.save()
+console.log('savedExercise', savedExercise)
+
+res.status(201).json({
+  msg:"new exercise saved"
+})
+
 }
 
-export { createExercise, getExercises };
+
+
+export {createExercise, getExercises}
