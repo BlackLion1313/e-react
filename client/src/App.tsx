@@ -1,19 +1,23 @@
-import "./App.css";
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import ExerciseComponent from './components/ExcerciseComponent';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './views/Home';
+import ExcersisesPage from './views/ExcersisesPage';
+import Register from './views/Register';
+import LoginPage from './views/LoginPage';
+import NotFoundPage from './views/NotFoundPage';
 
-import Register from "./views/Register";
-
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<ExerciseComponent />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/exercises" element={<ExcersisesPage/>} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <Register />
-    </BrowserRouter>
+    </Router>
   );
-}
+};
 
 export default App;
-

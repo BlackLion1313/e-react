@@ -11,5 +11,10 @@ const hashedPassword = async (userPassword) => {
     console.log("error hashing password", error);
   }
 };
+const verifyPassword = async (loginPassword, storedPassword) => {
+const verifiedToken = bcrypt.compare(loginPassword, storedPassword);
 
-export { hashedPassword };
+return verifiedToken; //output true if both passwords match and false if not
+};
+
+export { hashedPassword, verifyPassword };

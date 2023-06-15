@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "../models/usersModel.js";
-import { hashedPassword } from "../utils/encryptPassword.js";
+import { hashedPassword, verifyPassword } from "../utils/encryptPassword.js";
+import { issueToken } from "../utils/jwtToken.js";
 
 const imageUpload = async (req, res) => {
   console.log("req.file", req.file);
@@ -74,4 +75,59 @@ const register = async (req, res) => {
   }
 };
 
-export { imageUpload, register };
+const login = async (req, res) => {
+  const { email, password } = req.body
+  try {
+    const existingUser = await userModel.findOne({ email: email })
+    console.log('existingUser', existingUser);
+    if (!existingUser) {
+      res.status(404).json({
+        error: "Sorry, there is no user registered with this email",
+      });
+    } else {
+      //if user exists-verify password
+      try {
+        const checkedPassword = await verifyPassword(
+          password,
+          existingUser.password
+        );
+
+        if (!checkedPassword) {
+          //password is wrong
+          res.status(401).json({
+            error: "Wrong password please try again"
+          });
+        } else {
+          //if credential are mathcing, we generate the JWT verifiedToken
+
+          console.log('all Goog');
+
+          const token = issueToken(existingUser._id);
+
+          if (token) {
+            res.status(200).json({
+              msg: "Login successful!",
+              //in this case we are sending user
+              user: {
+                userName: existingUser.userName,
+                email: existingUser.email,
+                avatar: existingUser.avatar,
+              },
+              token,
+            });
+          } else {
+            console.log('PROBLEM WITH GENERATION TOKEN')
+            res.status(500).json({
+              msg: "Something went wrong during login",
+            })
+          }
+
+        }
+      } catch (error) {
+
+      }
+    }
+  } catch (error) { }
+};
+
+export { imageUpload, register, login };

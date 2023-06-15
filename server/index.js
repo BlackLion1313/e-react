@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import testRouter from './routes/testRouter.js';
-import citiesRouter from './routes/citiesRouter.js';
-import museumsRoutes from './routes/museumsRoutes.js';
+// import testRouter from './routes/testRouter.js';
+// import citiesRouter from './routes/citiesRouter.js';
+// import museumsRoutes from './routes/museumsRoutes.js';
 import userRoutes from './routes/usersRoutes.js';
 import exercisesRoutes from "./routes/exercisesRoutes.js"
 import multer from 'multer';
@@ -45,9 +45,9 @@ const connectMongoDB = async () => {
 };
 
 const loadRoutes = () => {
-  app.use('/test', testRouter);
-  app.use('/api/cities', citiesRouter);
-  app.use('/api/museums', museumsRoutes);
+  // app.use('/test', testRouter);
+  // app.use('/api/cities', citiesRouter);
+  // app.use('/api/museums', museumsRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/exercises', exercisesRoutes)
 };
