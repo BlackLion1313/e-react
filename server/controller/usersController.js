@@ -31,26 +31,37 @@ const register = async (req, res) => {
   console.log("req.body", req.body);
   // const {email} = req.body // destructured
   // Check if the user is already in our database
-  //CHECK Passwords and emails before saving (maybe use express validator pack, or regex, or your own solution)
+  //CHECK!!!! Passwords and emails before saving (maybe use express validator pack, or regex, or your own solution)
   try {
+
+    //checking if our user exists
     const existingUser = await userModel.findOne({ email: req.body.email });
 
+
     console.log("existingUser", existingUser);
+
+    //пользователь с указанным email не существует в базе данных
     if (!existingUser) {
       //if our user doesn't exist in our database, we store it
       try {
         const encryptedPassword = await hashedPassword(req.body.password);
 
         if (encryptedPassword) {
+
+          //создаем новый экземпляр userModel
           const newUser = new userModel({
             userName: req.body.userName,
             email: req.body.email,
             password: encryptedPassword,
             avatar: req.body.avatar,
           });
+
+          //сохраняет новый экземпляр пользователя в базе данных с помощью метода save,
+          // который возвращает сохраненный объект пользователя
           const savedUser = await newUser.save();
 
           console.log("savedUser", savedUser);
+          //отправляет JSON-ответ с кодом состояния 201 (создан) и включает информацию о пользователе в теле ответа.
           res.status(201).json({
             user: {
               userName: savedUser.userName,
