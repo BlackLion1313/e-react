@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
 dotenv.config();
+
+//generate TOKEN
 const issueToken = (userId) => {
   const options = {
     //setting expiration time before blabla

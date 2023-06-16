@@ -29,7 +29,7 @@ const imageUpload = async (req, res) => {
 
 const register = async (req, res) => {
   console.log("req.body", req.body);
-  // const {email} = req.body // destructured
+  const {email} = req.body // destructured
   // Check if the user is already in our database
   //CHECK!!!! Passwords and emails before saving (maybe use express validator pack, or regex, or your own solution)
   try {
@@ -141,4 +141,16 @@ const login = async (req, res) => {
   } catch (error) { }
 };
 
-export { imageUpload, register, login };
+const getProfile = async (req, res) => {
+  console.log("req.user>>>", req.user);
+
+  res.status(200).json({
+    user: {
+      userName: req.user.userName,
+      email: req.user.email,
+      avatar: req.user.avatar,
+    },
+  });
+};
+
+export { imageUpload, register, login, getProfile };

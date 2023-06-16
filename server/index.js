@@ -9,6 +9,9 @@ import userRoutes from './routes/usersRoutes.js';
 import exercisesRoutes from "./routes/exercisesRoutes.js"
 import multer from 'multer';
 import cloudinaryConfig from './config/cloudinary.js';
+import { jwtStrategy } from "./config/passport.js";
+import passport from 'passport';
+
 
 dotenv.config();
 
@@ -25,6 +28,8 @@ const addMiddlewares = () => {
   app.use(cors());
   // app.use(multer().single("image"));
   cloudinaryConfig();
+  app.use(passport.initialize());
+  passport.use(jwtStrategy);
 };
 
 const startServer = () => {

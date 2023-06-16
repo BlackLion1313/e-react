@@ -16,6 +16,9 @@ function Home({}: Props) {
     <NavLink className='mx-4' to='/register'>
       Register
     </NavLink>
+    <NavLink className='mx-4' to='/profile'>
+     Profile
+    </NavLink>
   
   </>
   ) 
