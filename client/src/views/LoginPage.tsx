@@ -1,22 +1,21 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-type Props = {};
+const LoginPage = () => {
+  const navigate = useNavigate();
 
-const LoginPage = (props: Props) => {
-  //email and pass of the user
-  const [loginCredentials, setLoginCredentials] = useState<LoginCredentials>({
+  const [loginCredentials, setLoginCredentials] = useState({
     email: "",
     password: "",
   });
 
-  //this should belong to const
   const [user, setUser] = useState<User | null>({
     userName: "",
     email: "",
     avatar: "",
   });
 
-  const [error, setError] = useState<ResponseError>(null);
+  const [error, setError] = useState<ResponseError | null>(null);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLoginCredentials({
@@ -25,107 +24,130 @@ const LoginPage = (props: Props) => {
     });
   };
 
-  const submitLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const validateForm = () => {
+    if (!loginCredentials.email || !loginCredentials.password) {
+      setError("Please enter both email and password.");
+      return false;
+    }
+
+    if (!validateEmail(loginCredentials.email)) {
+      setError("Invalid email address.");
+      return false;
+    }
+
+    setError(null);
+    return true;
+  };
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const submitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const myHeader = new Headers();
-    myHeader.append("Content-Type", "application/x-www-form-urlencoded");
-
-    const urlencoded = new URLSearchParams();
-    urlencoded.append("email", loginCredentials.email);
-    urlencoded.append("password", loginCredentials.password);
+    if (!validateForm()) {
+      return;
+    }
 
     const requestOptions = {
       method: "POST",
-      headers: myHeader,
-      body: urlencoded,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loginCredentials),
     };
 
     try {
       const response = await fetch(
-        "http://localhost:5001/api/users/login",
+      `${import.meta.env.VITE_SERVER_URL}api/users/login`,
         requestOptions
       );
-      console.log("response", response);
 
       if (response.ok) {
-        const result = (await response.json()) as FetchLoginResult;
-        //store the token(ls)
+        const result = await response.json();
         const { token, user, msg } = result;
         if (token) {
           localStorage.setItem("token", token);
-          setUser(result.user);
+          setUser(user);
+          navigate("/profile");
         }
-        console.log("result", result);
-
-        if (response.status === 404) {
-          const result: FetchError = await response.json();
-          setError(result.error);
-        }
+      } else {
+        const result = await response.json();
+        setError(result.error);
       }
     } catch (error) {
-      console.log("error during login", error);
+      console.log("Error during login:", error);
     }
-
-    console.log("loginCredentials", loginCredentials);
   };
+
   const checkUserStatus = () => {
     const token = localStorage.getItem("token");
     if (token) {
-      console.log("user is logged in");
+      console.log("User is logged in");
     } else {
-      console.log("user is logged out");
+      console.log("User is logged out");
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-  };
+
 
   useEffect(() => {
     checkUserStatus();
   }, [user]);
 
   return (
-    <div className="container">
-      <h1>Login Page</h1>
-      {error && <h2>{error}</h2>}
-      <button className="btn btn-primary" onClick={logout}>
-        Logout
-      </button>
-      <form>
-        <div className="mb-3">
-          <label htmlFor="email" className="form-label">
-            Email
-          </label>
-          <input
-            type="email"
-            className="form-control"
-            name="email"
-            id="login-email"
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">
-            Password
-          </label>
-          <input
-            type="password"
-            className="form-control"
-            name="password"
-            id="login-password"
-            onChange={handleInputChange}
-          />
-        </div>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          onClick={submitLogin}
-        >
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md p-6 bg-white rounded shadow-lg">
+        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
           Login
-        </button>
-      </form>
+        </h1>
+ 
+        <form onSubmit={submitLogin}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              className="w-full border border-gray-300 px-3 py-2 rounded"
+              onChange={handleInputChange}
+              autoComplete="email"
+            />
+          </div>
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              className="w-full border border-gray-300 px-3 py-2 rounded"
+              onChange={handleInputChange}
+              autoComplete="current-password"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-gray-500  hover:bg-gray-600  text-white font-bold py-2 px-4 rounded"
+          >
+            Login
+          </button>
+        </form>
+        {error && (
+          <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+        <p className="text-center mt-4 text-gray-800">
+          Not registered?{" "}
+          <Link to="/register" className="text-blue-500 hover:underline">
+            Register here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

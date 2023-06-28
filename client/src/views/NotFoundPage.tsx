@@ -1,8 +1,4 @@
-import React from 'react'
-
-type Props = {}
-
-function NotFoundPage({}: Props) {
+function NotFoundPage() {
   return (
     <div>NotFoundPage</div>
   )

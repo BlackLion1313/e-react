@@ -1,12 +1,11 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, useNavigate } from "react-router-dom";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-type Props = {};
 
-const Register = (props: Props) => {
+const Register = () => {
+  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | string>("");
-  const [newUser, setNewUser] = useState<RegisterCredentials >({
+  const [newUser, setNewUser] = useState<RegisterCredentials>({
     userName: "",
     email: "",
     password: "",
@@ -20,11 +19,13 @@ const Register = (props: Props) => {
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log([e.target.name], e.target.value);
     setNewUser({ ...newUser, [e.target.name]: e.target.value });
   };
 
-  const submitPicture = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const submitPicture = async (e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault(); // Prevent form submission if the event exists
+
     const formdata = new FormData();
     formdata.append("image", selectedFile);
 
@@ -35,11 +36,12 @@ const Register = (props: Props) => {
 
     try {
       const response = await fetch(
-        "http://localhost:5001/api/users/imageUpload",
+        "http://localhost:5005/api/users/imageUpload",
         requestOptions
       );
       if (response.ok) {
         const result = await response.json();
+
         setNewUser({ ...newUser, avatar: result.avatar });
         console.log("result", result);
       }
@@ -49,10 +51,10 @@ const Register = (props: Props) => {
   };
 
   const register = async () => {
+    await submitPicture(); // Wait for submitPicture to complete
     console.log("newUser", newUser);
-    // const navigate = useNavigate();
 
-  const myHeaders = new Headers();
+    const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
     const urlencoded = new URLSearchParams();
@@ -74,84 +76,86 @@ const Register = (props: Props) => {
 
     try {
       const response = await fetch(
-        "http://localhost:5001/api/users/register",
+        `${import.meta.env.VITE_SERVER_URL}api/users/register`,
         requestOptions
       );
       const result = await response.json();
       console.log("result", result);
+      navigate("/login"); // Redirect to the login page
     } catch (error) {
       console.log("error", error);
-      // navigate('/');
-    } 
+    }
   };
 
   return (
-    <div className="container display-flex align-items-center ">
-      <h2 className="text-center mt-5">Register</h2>
-      <div className="row justify-content-center mt-3">
-        <div className="col-lg-12">
-          <div className="input-container">
-            <label htmlFor="userName">Enter your name here</label>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md max-w-md w-full">
+        <h2 className="text-3xl font-bold mb-6  text-gray-800">Create an Account</h2>
+        <form onSubmit={submitPicture} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="userName" className="text-lg font-semibold text-gray-700">
+              Username
+            </label>
             <input
               type="text"
               name="userName"
               id="userName"
-              className="form-control"
               onChange={handleInputChange}
+              className="w-full bg-gray-100 rounded border border-gray-300 px-4 py-2 focus:outline-none focus:border-blue-500"
             />
-            <label htmlFor="email">Email</label>
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-lg font-semibold text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
               id="email"
-              className="form-control"
-              autoComplete="email"
-              required
               onChange={handleInputChange}
+              className="w-full bg-gray-100 rounded border border-gray-300 px-4 py-2 focus:outline-none focus:border-blue-500"
             />
-            <label htmlFor="password">Password</label>
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-gray-700 text-lg font-semibold">
+              Password
+            </label>
             <input
               type="password"
               name="password"
               id="password"
-              className="form-control"
-              autoComplete="password"
-              required
               onChange={handleInputChange}
+              autoComplete="current-password"
+              className="w-full bg-gray-100 rounded border border-gray-300 px-4 py-2 focus:outline-none focus:border-blue-500"
             />
           </div>
-
-          <form onSubmit={submitPicture}>
-            <div className="mb-3">
-              <label htmlFor="file" className="form-label">
-                Your picture
-              </label>
-              <input
-                type="file"
-                name="file"
-                id="file"
-                className="form-control"
-                onChange={handleAttachFile}
-              />
-            </div>
-            <div className="mt-6">
-            <Link to="/login">Already have an account? Login here</Link>
-          </div>
-            <button type="submit" className="btn btn-primary">
-              Upload Picture
-            </button>
-          </form>
-
-          <button onClick={register} className="btn btn-primary mt-3">
-            Register
+          <input
+            type="file"
+            name="file"
+            id="file"
+            onChange={handleAttachFile}
+            className="mb-2"
+          />
+          <button
+            type="submit"
+            className="w-full bg-gray-500  hover:bg-gray-600  text-white font-bold py-2 px-4 rounded">
+            Upload Picture
           </button>
-        </div>
-      </div>
-
-      <div className="row justify-content-center mt-5">
-        {newUser && (
-          <div className="col-md-6 text-center">
-            <img src={newUser.avatar} alt="" className="avatar-picture" />
+        </form>
+        <button
+          onClick={register}
+          className="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded mt-4">
+          Register
+        </button>
+        <div className="mt-4 text-lg font-semibold"></div>
+        {newUser.avatar && (
+          <div>
+            <img
+              src={newUser.avatar}
+              alt=""
+              className="mt-2 rounded-full"
+              style={{ width: "100px", height: "100px" }}
+            />
           </div>
         )}
       </div>

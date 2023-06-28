@@ -29,39 +29,28 @@ const imageUpload = async (req, res) => {
 
 const register = async (req, res) => {
   console.log("req.body", req.body);
-  const {email} = req.body // destructured
+  // const {email} = req.body // destructured
   // Check if the user is already in our database
-  //CHECK!!!! Passwords and emails before saving (maybe use express validator pack, or regex, or your own solution)
+  //CHECK Passwords and emails before saving (maybe use express validator pack, or regex, or your own solution)
   try {
-
-    //checking if our user exists
     const existingUser = await userModel.findOne({ email: req.body.email });
 
-
     console.log("existingUser", existingUser);
-
-    //пользователь с указанным email не существует в базе данных
     if (!existingUser) {
       //if our user doesn't exist in our database, we store it
       try {
         const encryptedPassword = await hashedPassword(req.body.password);
 
         if (encryptedPassword) {
-
-          //создаем новый экземпляр userModel
           const newUser = new userModel({
             userName: req.body.userName,
             email: req.body.email,
             password: encryptedPassword,
             avatar: req.body.avatar,
           });
-
-          //сохраняет новый экземпляр пользователя в базе данных с помощью метода save,
-          // который возвращает сохраненный объект пользователя
           const savedUser = await newUser.save();
 
           console.log("savedUser", savedUser);
-          //отправляет JSON-ответ с кодом состояния 201 (создан) и включает информацию о пользователе в теле ответа.
           res.status(201).json({
             user: {
               userName: savedUser.userName,
@@ -78,25 +67,24 @@ const register = async (req, res) => {
       }
     } else {
       res.status(200).json({
-        msg: "sorry that email is already registered.",
+        msg: "sorry that email is already registed.",
       });
     }
-  } catch (error) {
-    console.log("error", error)
-  }
+  } catch (error) {}
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body
+  const { email, password } = req.body;
+
   try {
-    const existingUser = await userModel.findOne({ email: email })
-    console.log('existingUser', existingUser);
+    const existingUser = await userModel.findOne({ email: email });
+    console.log("existingUser", existingUser);
     if (!existingUser) {
       res.status(404).json({
-        error: "Sorry, there is no user registered with this email",
+        error: "Sorry, no user registered with this email",
       });
     } else {
-      //if user exists-verify password
+      //If user exists -> verfiy password
       try {
         const checkedPassword = await verifyPassword(
           password,
@@ -104,21 +92,19 @@ const login = async (req, res) => {
         );
 
         if (!checkedPassword) {
-          //password is wrong
+          //password is incorrect
           res.status(401).json({
-            error: "Wrong password please try again"
+            error: "Wrong password...try again",
           });
         } else {
-          //if credential are mathcing, we generate the JWT verifiedToken
-
-          console.log('all Goog');
+          // If credentials match, we generate the JWT token
+          console.log("all gooooood!!.....");
 
           const token = issueToken(existingUser._id);
-
+          console.log("token", token);
           if (token) {
             res.status(200).json({
-              msg: "Login successful!",
-              //in this case we are sending user
+              msg: "Login successful",
               user: {
                 userName: existingUser.userName,
                 email: existingUser.email,
@@ -127,30 +113,29 @@ const login = async (req, res) => {
               token,
             });
           } else {
-            console.log('PROBLEM WITH GENERATION TOKEN')
+            console.log("problem generating token");
             res.status(500).json({
-              msg: "Something went wrong during login",
-            })
+              msg: "something went wrong during login",
+            });
           }
-
         }
-      } catch (error) {
-
-      }
+      } catch (error) {}
     }
-  } catch (error) { }
+  } catch (error) {}
 };
 
 const getProfile = async (req, res) => {
-  console.log("req.user>>>", req.user);
+  console.log("working");
+  console.log("req.user", req.user);
 
-  res.status(200).json({
-    user: {
-      userName: req.user.userName,
-      email: req.user.email,
-      avatar: req.user.avatar,
-    },
-  });
+  if (req.user) {
+    res.status(200).json({
+      user: req.user,
+    });
+  } else {
+    res.status(404).json({
+      error: "no user in the database",
+    });
+  }
 };
-
 export { imageUpload, register, login, getProfile };
