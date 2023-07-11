@@ -12,7 +12,7 @@ import exercisesRoutes from './routes/exercisesRoutes.js'
 
 
 // respond with "hello world" when a GET request is made to the homepage
-app.get('/test', function(req, res) {
+app.get('/test', function (req, res) {
   res.send('hello world');
 });
 
@@ -38,18 +38,15 @@ const startServer = () => {
 };
 
 const connectMongoDB = async () => {
-  await mongoose.connect(process.env.DB)
+  mongoose.connect(process.env.DB)
   startServer();
   console.log("Mongo DB is running");
 };
 
 const loadRoutes = () => {
-  // app.use("/test", testRouter);
-  // app.use("/api/cities", citiesRouter);
-  // app.use("/api/museums", museumsRoutes);
   app.use("/api/users", usersRoutes);
-  app.use('/api/exercises', exercisesRoutes)
-  // app.use('/api/posts', postsRoutes)
+  app.use("/api/exercises", exercisesRoutes)
+
 };
 
 //IIFE

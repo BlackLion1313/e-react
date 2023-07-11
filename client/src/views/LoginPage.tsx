@@ -1,5 +1,15 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+interface User {
+  userName: string;
+  email: string;
+  avatar: string;
+}
+
+interface ResponseError {
+  error: string;
+}
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -9,11 +19,7 @@ const LoginPage = () => {
     password: "",
   });
 
-  const [user, setUser] = useState<User | null>({
-    userName: "",
-    email: "",
-    avatar: "",
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   const [error, setError] = useState<ResponseError | null>(null);
 
@@ -26,12 +32,12 @@ const LoginPage = () => {
 
   const validateForm = () => {
     if (!loginCredentials.email || !loginCredentials.password) {
-      setError("Please enter both email and password.");
+      setError({ error: "Please enter both email and password." });
       return false;
     }
 
     if (!validateEmail(loginCredentials.email)) {
-      setError("Invalid email address.");
+      setError({ error: "Invalid email address." });
       return false;
     }
 
@@ -59,13 +65,13 @@ const LoginPage = () => {
 
     try {
       const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}api/users/login`,
+        `${import.meta.env.VITE_SERVER_URL}api/users/login`,
         requestOptions
       );
 
       if (response.ok) {
         const result = await response.json();
-        const { token, user, msg } = result;
+        const { token, user } = result;
         if (token) {
           localStorage.setItem("token", token);
           setUser(user);
@@ -73,35 +79,26 @@ const LoginPage = () => {
         }
       } else {
         const result = await response.json();
-        setError(result.error);
+        setError(result);
       }
     } catch (error) {
       console.log("Error during login:", error);
     }
   };
 
-  const checkUserStatus = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      console.log("User is logged in");
-    } else {
-      console.log("User is logged out");
-    }
-  };
-
-
-
-  useEffect(() => {
-    checkUserStatus();
-  }, [user]);
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white rounded shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="w-full max-w-md p-6 bg-stone-300 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
           Login
         </h1>
- 
+
+        {user ? (
+          <p>Welcome, {user.userName}!</p>
+        ) : (
+          <p>Please login to continue.</p>
+        )}
+
         <form onSubmit={submitLogin}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700">
@@ -111,7 +108,7 @@ const LoginPage = () => {
               type="email"
               name="email"
               id="email"
-              className="w-full border border-gray-300 px-3 py-2 rounded"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-400"
               onChange={handleInputChange}
               autoComplete="email"
             />
@@ -124,21 +121,21 @@ const LoginPage = () => {
               type="password"
               name="password"
               id="password"
-              className="w-full border border-gray-300 px-3 py-2 rounded"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-400"
               onChange={handleInputChange}
               autoComplete="current-password"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-gray-500  hover:bg-gray-600  text-white font-bold py-2 px-4 rounded"
+            className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded"
           >
             Login
           </button>
         </form>
         {error && (
           <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
+            {error.error}
           </div>
         )}
         <p className="text-center mt-4 text-gray-800">

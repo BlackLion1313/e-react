@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const exercisesSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    auto: true,
+  },
   exerciseId: {
     type: Number,
     required: true,
@@ -26,23 +30,17 @@ const exercisesSchema = new mongoose.Schema({
     required: true,
     unique: false,
   },
-  difficulty: {
-    type: String,
-    required: true,
-    unique: false,
-  },
-  hints: {
-    type: [String],
-    required: false,
-    unique: false,
-  },
   solution: {
     type: String,
     required: true,
     unique: false,
   },
+  isFavorite: {
+    type: Boolean,
+    required: true,
+    default: false, // Optional: Set a default value for isFavorite
+  },
 });
 
 const exercisesModel = mongoose.model("exercise", exercisesSchema);
 export default exercisesModel;
-

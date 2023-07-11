@@ -40,13 +40,17 @@ interface FetchProfileResult {
   user: User;
 }
 interface Exercise {
-  _id: string;
   exerciseId: number;
   title: string;
   description: string;
   code: string;
   missingWords: string[];
-  difficulty: string;
-  hints: string[];
   solution: string;
+  isFavorite: boolean;
+}
+interface UserAnswers {
+  [exerciseId: number]: string[];
+}
+interface ExercisesPageProps {
+  exerciseId: number;
 }

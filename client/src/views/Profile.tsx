@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import checkUserStatus from "../utils/checkUserStatus";
+import checkUserStatus from "../utils/checkUserStatus"
 import { motion } from "framer-motion";
 
 const profileVariants = {
@@ -55,26 +55,30 @@ const Profile = () => {
 	}, []);
 
 	return (
-		<div className="max-w-lg mx-auto my-4">
-			{user !== null && (
-				<motion.div className="bg-white shadow rounded-lg p-6 mb-4"
-        variants={profileVariants}
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="max-w-lg mx-auto my-4">
+        {user !== null && (
+          <motion.div
+            className="bg-white shadow rounded-lg p-6 mb-4"
+            variants={profileVariants}
             initial="hidden"
             animate="visible"
-            transition={{ duration: 0.5 }}>
-					<p className="text-xl font-bold mb-2">{user.userName}</p>
-					<p className="text-lg text-gray-600">{user.email}</p>
-					<img
-						src={user.avatar}
-						alt=""
-						className="border-4 border-green-100 mt-4 w-48 h-48 rounded-full object-cover"
-					/>
-				</motion.div>
-			)}
+            transition={{ duration: 0.5 }}
+          >
+            <p className="text-xl font-bold mb-2">{user.userName}</p>
+            <p className="text-lg text-gray-600">{user.email}</p>
+            <img
+              src={user.avatar}
+              alt=""
+              className="border-4 border-sky-100 mt-4 w-48 h-48 rounded-full object-cover"
+            />
+          </motion.div>
+        )}
 
-			{error && <h3 className="text-red-500 mb-4">{error}</h3>}
-		</div>
-	);
+        {error && <h3 className="text-red-500 mb-4">{error}</h3>}
+      </div>
+    </div>
+  );
 };
 
 export default Profile;
