@@ -27,6 +27,8 @@ const Register = () => {
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setNewUser({ ...newUser, [e.target.name]: e.target.value });
 	};
+	console.log("newUser", newUser);
+	console.log("handleInputChange", handleInputChange);
 
 	const submitPicture = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -44,6 +46,7 @@ const Register = () => {
 				"http://localhost:5005/api/users/imageUpload",
 				requestOptions
 			);
+			console.log("response", response);
 			if (response.ok) {
 				const result = await response.json();
 				setNewUser({ ...newUser, avatar: result.avatar });
@@ -58,13 +61,15 @@ const Register = () => {
 
 	const register = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
+		console.log("register", register);
 
 		if (!newUser.userName || !newUser.email || !newUser.password) {
 			setErrorMessage("Please fill in all fields.");
 			return;
 		}
+		console.log("newUser777", newUser);
 
-		await submitPicture;
+		// await submitPicture;
 
 		const myHeaders = new Headers();
 		myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -121,6 +126,8 @@ const Register = () => {
 							type="text"
 							name="userName"
 							id="userName"
+							value={newUser.userName}
+							onChange={handleInputChange}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-400"
 							autoComplete="username"
 						/>

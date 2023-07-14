@@ -1,10 +1,10 @@
 const checkUserStatus = () => {
   const token = localStorage.getItem("token");
   if (token) {
-    console.log("%cuser is logged in", "color:green");
+    // console.log("%cuser is logged in", "color:green");
     return token;
   } else {
-    console.log("%cuser is logged out", "color:red");
+    // console.log("%cuser is logged out", "color:red");
     return null;
   }
 };

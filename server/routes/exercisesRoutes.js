@@ -19,4 +19,5 @@ router.delete('/:exerciseId', jwtAuth, deleteExercise);
 router.put('/:exerciseId', jwtAuth, updateExercise);
 router.put('/:exerciseId/favorite', jwtAuth, updateExerciseFavoriteStatus);
 
+
 export default router;

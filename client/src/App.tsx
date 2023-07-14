@@ -8,14 +8,12 @@ import ExercisesPage from "./views/ExercisesPage";
 import FavouritesPage from "./views/FavouritesPage";
 import { Navigation } from "./components/Navigation";
 import { ExerciseForm } from "./views/ExerciseForm";
-// import { AuthProvider } from "./context/AuthContext";
 import { Footer } from "./components/Footer";
 
 
 const App = () => {
   return (
     <Router>
-      {/* <AuthProvider> */}
         <Navigation />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -29,7 +27,6 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Footer />
-      {/* </AuthProvider> */}
     </Router>
   );
 };

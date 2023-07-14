@@ -22,6 +22,7 @@
     "react-router-dom": "^6.12.1",
     "react-scroll-parallax": "^3.4.2",
     "react-spinners": "^0.13.8",
+    "react-tooltip": "^5.18.0",
     "validator": "^13.9.0"
   },
   "devDependencies": {

@@ -1,7 +1,10 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useState,  ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import checkUserStatus from "../utils/checkUserStatus";
+import { useNavigate } from "react-router-dom";
+
+
 
 interface Exercise {
 	_id: string;
@@ -25,6 +28,11 @@ export function ExerciseForm() {
 	});
 	const [isExerciseCreated, setIsExerciseCreated] = useState(false);
 	const [createdExercise, setCreatedExercise] = useState<Exercise | null>(null);
+	const navigate = useNavigate();
+
+	const handleCrossClick = () => {
+		navigate("/exercises"); // Navigate to exercises page when the cross button is clicked
+	};
 
 	const handleInputChange = (
 		event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -38,19 +46,22 @@ export function ExerciseForm() {
 
 	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault();
-
-		if (!exercise.description || !exercise.code || !exercise.solution) {
+	
+		if (!exercise.description || !exercise.code || !exercise.solution || !exercise.missingWords || !exercise.title) {
 			console.error("Please fill in all required fields.");
 			return;
 		}
+	
 		const token = checkUserStatus();
+	
 		try {
-			if (isExerciseCreated) {
+			//Если у нас есть createdExercise (т.е. мы ред существующее упр)
+			//мы выполняем запрос на апдейт упражнения с помощью axios.put
+			//АПДЕЙТ
+			if (createdExercise) {
 				console.log("Exercise edited:", exercise);
-				await axios.put(
-					`${import.meta.env.VITE_SERVER_URL}api/exercises/${
-						createdExercise?._id
-					}`,
+				const res = await axios.put(
+					`${import.meta.env.VITE_SERVER_URL}api/exercises/${createdExercise._id}`,
 					exercise,
 					{
 						headers: {
@@ -59,7 +70,12 @@ export function ExerciseForm() {
 					}
 				);
 				console.log("Exercise updated successfully.");
+				setIsExerciseCreated(true);
+				//обновляем данные созданного упражнения
+				setCreatedExercise(res.data);
+				console.log('res!!!', res)
 			} else {
+				//если нет созданного упражнения
 				const response = await axios.post(
 					`${import.meta.env.VITE_SERVER_URL}api/exercises/post-exercise`,
 					exercise,
@@ -70,7 +86,7 @@ export function ExerciseForm() {
 					}
 				);
 				console.log("Exercise created successfully.");
-
+	
 				setIsExerciseCreated(true);
 				setCreatedExercise(response.data);
 			}
@@ -78,26 +94,36 @@ export function ExerciseForm() {
 			console.error(error);
 		}
 	};
+	
 
 	const handleDelete = async () => {
-		if (!createdExercise?._id) return;
+		if (!createdExercise) {
+			//проверяем есть ли упражне
+			console.error("No exercise has been created or loaded.");
+			return;
+		}
+	//вытягиваем конкрнтеый ид созданного упр
+		const { _id } = createdExercise;
 		const token = checkUserStatus();
-
+	
 		if (!token) {
 			console.error("Please log in first or check authorization.");
 			return;
 		}
-
+	
 		try {
-			await axios.delete(
-				`${import.meta.env.VITE_SERVER_URL}api/exercises/${createdExercise._id}`,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}
-			);
+			await axios.delete(`${import.meta.env.VITE_SERVER_URL}api/exercises/${_id}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+	
 			console.log("Exercise deleted successfully.");
+	
+			//no exercise is currently created
+			setIsExerciseCreated(false);
+			//resetштп to theirs initial values
+			setCreatedExercise(null);
 			setExercise({
 				_id: "",
 				exerciseId: 0,
@@ -107,61 +133,41 @@ export function ExerciseForm() {
 				missingWords: [""],
 				solution: "",
 			});
-			setIsExerciseCreated(false);
 		} catch (error) {
 			console.error(error);
 		}
 	};
+	
+	
+	
+	const populateFormWithExistingExercise = () => {
+  const token = checkUserStatus();
 
-	const handleEdit = () => {
-		const token = checkUserStatus();
+  if (!token) {
+    console.error("Please log in first or check authorization.");
+    return;
+  }
 
-		if (!token) {
-			console.error("Please log in first or check authorization.");
-			return;
-		}
+  if (!createdExercise) return;
+//предыдущего состояния 
+  setExercise((prevExerciseState) => ({
+    ...prevExerciseState,
+		//чтобы заполнить поля формы значениями существующего упражнения
+    _id: createdExercise._id,
+    exerciseId: createdExercise.exerciseId,
+    title: createdExercise.title,
+    description: createdExercise.description,
+    code: createdExercise.code,
+    missingWords: createdExercise.missingWords,
+    solution: createdExercise.solution,
+  }));
+	//форма находится в режиме редактирования
+  setIsExerciseCreated(false);
+	//для указания, что упражнение редактируется, а не создается заново.
+};
 
-		if (!createdExercise) return;
 
-		setExercise((prevExercise) => ({
-			...prevExercise,
-			_id: createdExercise._id,
-			exerciseId: createdExercise.exerciseId,
-			title: createdExercise.title,
-			description: createdExercise.description,
-			code: createdExercise.code,
-			missingWords: createdExercise.missingWords,
-			solution: createdExercise.solution,
-		}));
-		setIsExerciseCreated(false);
-		setCreatedExercise(null);
-	};
 
-	const fetchExercise = async (exerciseId: number) => {
-		const token = checkUserStatus();
-		try {
-			const response = await axios.get(
-				`${import.meta.env.VITE_SERVER_URL}api/exercises/${exerciseId}`,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}
-
-			);
-
-			setCreatedExercise(response.data.exercise);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	useEffect(() => {
-		if (createdExercise && createdExercise.exerciseId) {
-			const exerciseId = createdExercise.exerciseId;
-			fetchExercise(exerciseId);
-		}
-	}, [createdExercise]);
 
 	return (
 		<form
@@ -169,7 +175,7 @@ export function ExerciseForm() {
 			className="min-h-screen bg-gray-900 flex items-center justify-center">
 			{!isExerciseCreated ? (
 				<motion.div
-					className="bg-stone-300 text-gray-600 shadow-lg rounded-lg p-6 w-1/3"
+					className="bg-stone-300 text-gray-600 shadow-lg rounded-lg p-6 w-1/3 relative"
 					initial={{ scale: 0, opacity: 0 }}
 					animate={{ scale: 1, opacity: 1 }}
 					transition={{ duration: 0.5 }}>
@@ -255,10 +261,19 @@ export function ExerciseForm() {
 						className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
 						Create
 					</button>
+					<button
+						type="button"
+						className="absolute top-4 right-4 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center focus:outline-none group"
+						onClick={handleCrossClick}>
+						<span className="text-xs">X</span>
+						<span className="absolute opacity-0 bg-stone-500 text-white text-xs rounded-md py-1 px-2 top-[-2.5] left-[-30%] group-hover:opacity-100 transition-opacity duration-300">
+							Explore it now
+						</span>
+					</button>
 				</motion.div>
 			) : (
 				<motion.div
-					className="bg-stone-300 text-gray-600 shadow-lg rounded-lg p-6 w-1/3"
+					className="bg-stone-300 text-gray-600 shadow-lg rounded-lg p-6 w-1/3 relative"
 					initial={{ scale: 0, opacity: 0 }}
 					animate={{ scale: 1, opacity: 1 }}
 					transition={{ duration: 0.5 }}>
@@ -304,6 +319,7 @@ export function ExerciseForm() {
 							name="code"
 							value={exercise.code}
 							readOnly
+							title="Enter code here BUT dont forget in the place where should be missing part write this sigh %"
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"></textarea>
 					</div>
 					<div className="mb-4">
@@ -338,7 +354,7 @@ export function ExerciseForm() {
 						<button
 							type="button"
 							className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 mr-2"
-							onClick={handleEdit}>
+							onClick={populateFormWithExistingExercise}>
 							Edit
 						</button>
 						<button
@@ -347,7 +363,17 @@ export function ExerciseForm() {
 							onClick={handleDelete}>
 							Delete
 						</button>
+						
 					</div>
+					<button
+						type="button"
+						className="absolute top-4 right-4 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center focus:outline-none group"
+						onClick={handleCrossClick}>
+						<span className="text-xs">X</span>
+						<span className="absolute opacity-0 bg-stone-500 text-white text-xs rounded-md py-1 px-2 top-[-2.5] left-[-30%] group-hover:opacity-100 transition-opacity duration-300">
+							Explore it now
+						</span>
+					</button>
 				</motion.div>
 			)}
 		</form>

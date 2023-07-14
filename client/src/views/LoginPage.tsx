@@ -1,11 +1,12 @@
 import React, { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { User } from "../@types";
 
-interface User {
-  userName: string;
-  email: string;
-  avatar: string;
-}
+// interface User {
+//   userName: string;
+//   email: string;
+//   avatar: string;
+// }
 
 interface ResponseError {
   error: string;
@@ -75,7 +76,7 @@ const LoginPage = () => {
         if (token) {
           localStorage.setItem("token", token);
           setUser(user);
-          navigate("/profile");
+          navigate("/");
         }
       } else {
         const result = await response.json();

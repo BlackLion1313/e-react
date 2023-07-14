@@ -13,10 +13,9 @@ router.post("/imageUpload", multerUpload.single("image"), imageUpload);
 
 router.post("/register", register);
 router.post("/login", login);
-router.get('/test', (req, res) => {
-  res.send({message: 'nanananannananana'})
-})
-// router.get("/profile", getProfile);
 router.get("/profile", jwtAuth, getProfile);
+// router.get('/test', (req, res) => {
+//   res.send({message: 'nanananannananana'})
+// })
 
 export default router;
